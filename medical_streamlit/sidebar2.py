@@ -1,11 +1,6 @@
 import streamlit as st 
-import fitz
-import tempfile
-import os
-import base64
 from PyPDF2 import PdfReader 
-import PyPDF2
-import atexit
+
 import requests 
 import re
 from bs4 import BeautifulSoup
@@ -14,14 +9,14 @@ import torch
 from langchain.text_splitter import CharacterTextSplitter,RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
-from langchain.memory import ConversationBufferMemory
-from langchain.chains import ConversationalRetrievalChain
-from langchain.chains import RetrievalQAWithSourcesChain
+# from langchain.memory import ConversationBufferMemory
+# from langchain.chains import ConversationalRetrievalChain
+# from langchain.chains import RetrievalQAWithSourcesChain
 from langchain.llms import HuggingFaceHub
 from dotenv import load_dotenv
 from transformers import AutoModel, AutoTokenizer
-from sentence_transformers import SentenceTransformer
-from langchain.chains.question_answering import load_qa_chain
+# from sentence_transformers import SentenceTransformer
+# from langchain.chains.question_answering import load_qa_chain
 
 
 
