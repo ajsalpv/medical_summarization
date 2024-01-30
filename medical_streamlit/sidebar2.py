@@ -282,7 +282,7 @@ def app():
             
             
             st.header("Answer")
-            st.write(docs)
+            st.write(str(docs[0]))
 
 
      
