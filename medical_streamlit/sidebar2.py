@@ -12,7 +12,6 @@ from langchain_community.vectorstores import FAISS
 # from langchain.chains import ConversationalRetrievalChain
 # from langchain.chains import RetrievalQAWithSourcesChain
 from langchain.llms import HuggingFaceHub
-from dotenv import load_dotenv
 from transformers import AutoModel, AutoTokenizer
 # from sentence_transformers import SentenceTransformer
 # from langchain.chains.question_answering import load_qa_chain
