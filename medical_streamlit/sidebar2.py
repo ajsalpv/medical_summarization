@@ -130,9 +130,9 @@ def get_text_from_website(url):
         return f"Error: {e}"
     
 
-
+moddel='sentence-transformers/all-mpnet-base-v2'
 def get_ans(texts,query):
-    embeddings = HuggingFaceEmbeddings(model_name='sentence-transformers/all-mpnet-base-v2')
+    embeddings = HuggingFaceEmbeddings(model_name=moddel)
         
     print('embeddign')
     db = FAISS.from_texts(texts, embeddings)
