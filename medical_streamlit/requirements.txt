@@ -4,4 +4,4 @@ transformers
 torch
 langchain
 langchain_community
-dotenv
+
