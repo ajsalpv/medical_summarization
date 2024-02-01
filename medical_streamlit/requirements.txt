@@ -1,3 +1,7 @@
 PyPDF2
 bs4
 transformers
+torch
+langchain
+langchain_community
+dotenv
