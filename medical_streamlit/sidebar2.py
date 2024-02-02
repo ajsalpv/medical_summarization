@@ -277,10 +277,12 @@ def app():
         if query:
             print(query)
             docs=get_ans(texts,query)
-            
+
+            ans=str(docs[0])
+            ans=ans.replace('page_content=', '')
             
             st.header("Answer")
-            st.write(str(docs[0]))
+            st.write(ans)
 
 
      
