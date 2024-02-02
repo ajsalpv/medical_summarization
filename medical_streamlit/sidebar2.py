@@ -24,7 +24,7 @@ st.set_page_config(layout="wide")
 @st.cache_resource
 def load_medical_summarization_model():
     # Load the medical summarization model and tokenizer
-    model_name = "Falconsai/medical_summarization"
+    model_name = "Abdulkader/autotrain-medical-reports-summarizer-2484176581"
     model = T5ForConditionalGeneration.from_pretrained(model_name)
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
