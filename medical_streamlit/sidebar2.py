@@ -102,6 +102,8 @@ unwanted_symbols = {
 
 # Function to preprocess text
 def preprocess_text(text):
+    # Remove small numbers (1-3 digits) that are not part of larger words or numbers:
+    text = re.sub(r"(?<![a-zA-Z0-9])\d{1,3}(?![a-zA-Z0-9])", "", text)
     # Example: Remove non-alphanumeric characters and extra whitespaces
     text = re.sub(r'[^a-zA-Z0-9\s]', '', text)
     text = re.sub(r'\s+', ' ', text).strip()
