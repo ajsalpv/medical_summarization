@@ -81,7 +81,7 @@ def summary(text,max_length):
         summary = summarizer(
             tokenizer.decode(inputs[0], skip_special_tokens=True),
             max_length=max_length//len(inputs_batch_lst),
-            min_length=100,
+            min_length=100//len(inputs_batch_lst),
             length_penalty=2.0,
             do_sample=False
         )[0]['summary_text']
