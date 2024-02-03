@@ -55,25 +55,7 @@ def summary(text,max_length):
         chunk_end += tokenizer.model_max_length  # == 1024 for Bart
 
 
-    # Manually construct custom prompt for the current batch
-    custom_prompt = f"""Summarize the provided medical literature, extracting key findings, methodologies, and implications. 
-    Tailor the summary to be accessible to healthcare professionals, researchers, medical students, and the general public. 
-    Include essential details, important terms, and practical insights. 
-    If the model identifies sections or paragraphs that it deems important based on the content, dynamically create new paragraphs with relevant headings to highlight these important insights. 
-    Additionally, perform named entity recognition to identify and highlight important entities in the summary. Finally, provide a list of recognized key terms at the end of the summary : """
-
-    # prompt=custom_prompt+inputs
-
-    # generate a summary on each batch
-    # summary_ids_lst = [model.generate(inputs, num_beams=4, max_length=max_length, early_stopping=True,) for inputs in inputs_batch_lst]
-    
-    # # decode the output and join into one string with one paragraph per summary batch
-    # summary_batch_lst = []
-    # for summary_id in summary_ids_lst:
-    #     summary_batch = [tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=False) for g in summary_id]
-    #     summary_batch_lst.append(summary_batch[0])
-    # summary_all = '\n'.join(summary_batch_lst)
-
+   
 
 
     summary_batch_lst = []
@@ -156,9 +138,6 @@ def get_pdf_text(uploaded_file):
 
 
 
-
-
-
 def app():
     
     # Sidebar
@@ -180,40 +159,8 @@ def app():
             with container1:
             
                 st.markdown("#### Article")
-                # with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
-                #     temp_file_path = temp_file.name
-                #     temp_file.write(uploaded_file.getvalue())
-
-                #     # Open the saved PDF file using PyMuPDF
-                #     pdf_document = fitz.open(temp_file_path)
-
-                #     # Define the translation table to remove unwanted symbols
-                #     translation_table = str.maketrans('', '', ''.join(unwanted_symbols))
-
-                #     # Iterate through pages
-                #     for page_num in range(pdf_document.page_count):
-                #         page = pdf_document[page_num]
-                #         text = page.get_text()
-
-                #         # Check if text contains "REFERENCE" in uppercase
-                #         if "REFERENCE" in text.upper():
-                #             # Stop appending text when reference is found
-                #             break
-
-                #         # Close the PDF document
-                #         pdf_document.close()
-
-                #         # Remove unwanted symbols
-                #         text = text.translate(translation_table)
-
-                #         # Display text content in Streamlit
-                #         st.write(text)
-                #         output=summary(text,max_length=max_length)
-
-                #         # # Close the PDF document
-                #         # pdf_document.close()
-                #         # Remove the temporary file
-                #         os.remove(temp_file_path)
+               
+              
                 pdf_text = get_pdf_text(uploaded_file)
                 preprocessed_text = preprocess_text(pdf_text)
                 
@@ -222,8 +169,6 @@ def app():
                 st.write(preprocessed_text)
                 
 
-                    
-            
 
             # Container 2 for additional content
             container2=st.container(border=True,height=300)
@@ -287,21 +232,6 @@ def app():
             st.write(ans)
 
 
-     
-
-    # # Main content area logic
-    # if uploaded_pdf:
-    #     st.write("Uploaded PDF filename:", uploaded_pdf.name)
-    #     # Add code to process or display the uploaded PDF content here
-
-    # if website_url:
-    #     st.write("You entered:", website_url)
-
-
-
-    # if button_clicked:
-    #     # Add code to handle the button click event here
-    #     st.write("Button clicked!")
 
 if __name__ == "__main__":
     app()
