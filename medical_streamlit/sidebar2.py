@@ -153,13 +153,16 @@ def app():
 
     # Inner containers closer to the sidebar
     with col1:
+        container1=st.container(border=True,height=300)
+        container1.markdown("#### Article")
+        container2=st.container(border=True,height=300)
+        container2.markdown("#### Summary")
+        
         if uploaded_file is not None and summary_button:
         # Container 1 for specific content
-            container1=st.container(border=True,height=300)
-            with container1:
             
-                st.markdown("#### Article")
-               
+            with container1:
+        
               
                 pdf_text = get_pdf_text(uploaded_file)
                 preprocessed_text = preprocess_text(pdf_text)
@@ -169,11 +172,9 @@ def app():
                 st.write(preprocessed_text)
                 
 
-
-            # Container 2 for additional content
-            container2=st.container(border=True,height=300)
+            
             with container2:
-                st.markdown("#### Summary")
+                
                 st.write(output)
             
 
