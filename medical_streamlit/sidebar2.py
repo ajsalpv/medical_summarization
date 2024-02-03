@@ -223,7 +223,7 @@ def app():
         texts = text_splitter.split_text(text)
         
 
-        query = st.text_input("Question: ")
+        
         if query:
             print(query)
             docs=get_ans(texts,query)
