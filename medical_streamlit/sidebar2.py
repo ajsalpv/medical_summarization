@@ -177,8 +177,6 @@ def app():
                 st.write(output)
             
 
-
-
         elif website_url and summary_button:
             container1=st.container(border=True,height=300)
             with container1:
@@ -199,9 +197,14 @@ def app():
 
             
     with col2:
-        
-        
         st.header("Ask About the ARTICLE")
+        query = st.text_input("Question: ")
+        container3=st.container(border=True,height=500)
+        # container3.write('answer')
+        container3.header("Answer")
+        
+        
+        
         text=''
         if uploaded_file is not None:
             pdf_reader = PdfReader(uploaded_file)
@@ -218,7 +221,7 @@ def app():
             chunk_overlap=200,
             )
         texts = text_splitter.split_text(text)
-        print('chunks')
+        
 
         query = st.text_input("Question: ")
         if query:
@@ -228,8 +231,8 @@ def app():
             ans=str(docs[0])
             ans=ans.replace('page_content=', '')
             
-            st.header("Answer")
-            st.write(ans)
+            container3.write(ans)
+
 
 
 
