@@ -207,7 +207,6 @@ def app():
             with container1:
                 st.markdown("#### Article")
                 extracted_text = get_text_from_website(website_url)
-                st.write("Extracted and Preprocessed Text:")
                 if "Error:" in extracted_text:
                     st.error(extracted_text)
                 else:
