@@ -126,7 +126,7 @@ def get_text_from_website(url):
 
 
 def get_ans(texts,query):
-    embeddings = HuggingFaceEmbeddings(model_name=moddel)
+    embeddings = HuggingFaceEmbeddings(model_name=ans_model)
         
     print('embeddign')
     db = FAISS.from_texts(texts, embeddings)
