@@ -35,6 +35,16 @@ model_name,tokenizer=load_medical_summarization_model()
 
 
 
+@st.cache_resource
+def model_ans():
+    # mdl='Maite89/Roberta_finetuning_semantic_similarity_stsb_multi_mt'
+   
+    mdl='sentence-transformers/all-mpnet-base-v2'
+    w_mdl='sentence-transformers/all-MiniLM-L6-v2'
+    return mdl,w_mdl
+
+ans_model,w_ans_model=model_ans()
+
 def summary(text,max_length):
 
     summarizer = pipeline("summarization", model=model_name, tokenizer=model_name)
@@ -114,7 +124,7 @@ def get_text_from_website(url):
         return f"Error: {e}"
     
 
-moddel='sentence-transformers/all-mpnet-base-v2'
+
 def get_ans(texts,query):
     embeddings = HuggingFaceEmbeddings(model_name=moddel)
         
@@ -123,6 +133,20 @@ def get_ans(texts,query):
     print('vector')
     retriever=db.as_retriever(search_type='similarity_score_threshold', search_kwargs={"score_threshold": 0.5})
     docs = retriever.get_relevant_documents(query)
+    return docs
+
+
+def get_ans_web(texts,query):
+    # texts=texts[0]
+    print('type of the docs is : ',type(texts),'length of the docs: ',len(texts))
+    embeddings = HuggingFaceEmbeddings(model_name=w_ans_model)
+        
+    print('embeddign')
+    db = FAISS.from_texts(texts, embeddings)
+    print('vector')
+    embedding_vector = embeddings.embed_query(query)
+    docs=db.similarity_search_by_vector(embedding_vector)
+    print('type of the docs is : ',type(docs),'length of the docs: ',len(docs))
     return docs
 
 
@@ -208,32 +232,47 @@ def app():
         
         text=''
         if uploaded_file is not None:
-            pdf_reader = PdfReader(uploaded_file)
+           pdf_reader = PdfReader(uploaded_file)
             text = ""
             for page in pdf_reader.pages:
                 text += page.extract_text()
             text=text.replace("\n", "")
-        elif website_url:
-            text = get_text_from_website(website_url)
-
-        text_splitter = RecursiveCharacterTextSplitter(
+            text_splitter = RecursiveCharacterTextSplitter(
             separators=['\n\n', '\n', '.', ','],
             chunk_size=1000,
             chunk_overlap=200,
             )
-        texts = text_splitter.split_text(text)
-        
+            texts = text_splitter.split_text(text)
+            print(len(texts),type(texts))
+            if query:
+                print(query)
+                docs=get_ans(texts,query)
+                print('length of the docs',len(docs))
+                print(type(docs))
+                ans=str(docs[0])
+                ans=ans.replace('page_content=', '')
+                container3.write(ans)
+        elif website_url:
+            text=""
+            text = get_text_from_website(website_url)
+            print(len(text))
+            text_splitter = RecursiveCharacterTextSplitter(
+            # separators=['\n\n', '\n', '.', ','],
+            chunk_size=1000,
+            chunk_overlap=200,
+            )
+            texts=text_splitter.split_text(text)
+            print(len(texts),type(texts))
+            if query:
+                print("link query",query)
+                wdocs=get_ans_web(texts,query)
+                print(type(wdocs))
+                strr=str(wdocs[0])
+                strr=strr.replace('page_content=', '')
+                container3.write(strr)
 
         
-        if query:
-            print(query)
-            docs=get_ans(texts,query)
-
-            ans=str(docs[0])
-            ans=ans.replace('page_content=', '')
-            
-            container3.write(ans)
-
+        
 
 
 
