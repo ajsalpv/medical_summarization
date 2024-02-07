@@ -174,7 +174,6 @@ def app():
 
         elif website_url and summary_button:
             with container1:
-                st.markdown("#### Article")
                 extracted_text = get_text_from_website(website_url)
                 if "Error:" in extracted_text:
                     st.error(extracted_text)
