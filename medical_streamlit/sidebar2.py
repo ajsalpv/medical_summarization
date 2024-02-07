@@ -8,9 +8,6 @@ import torch
 from langchain.text_splitter import CharacterTextSplitter,RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
-# from langchain.memory import ConversationBufferMemory
-# from langchain.chains import ConversationalRetrievalChain
-# from langchain.chains import RetrievalQAWithSourcesChain
 from langchain.llms import HuggingFaceHub
 from transformers import AutoModel, AutoTokenizer
 # from sentence_transformers import SentenceTransformer
@@ -27,18 +24,15 @@ def load_medical_summarization_model():
     model_name = "Abdulkader/autotrain-medical-reports-summarizer-2484176581"
     model = T5ForConditionalGeneration.from_pretrained(model_name)
     tokenizer = AutoTokenizer.from_pretrained(model_name)
-
     # Return the loaded model and tokenizer
     return model_name, tokenizer
 
 model_name,tokenizer=load_medical_summarization_model()
 
 
-
 @st.cache_resource
 def model_ans():
     # mdl='Maite89/Roberta_finetuning_semantic_similarity_stsb_multi_mt'
-   
     mdl='sentence-transformers/all-mpnet-base-v2'
     w_mdl='sentence-transformers/all-MiniLM-L6-v2'
     return mdl,w_mdl
@@ -46,9 +40,7 @@ def model_ans():
 ans_model,w_ans_model=model_ans()
 
 def summary(text,max_length):
-
     summarizer = pipeline("summarization", model=model_name, tokenizer=model_name)
-
     # tokenize without truncation
     inputs_no_trunc = tokenizer(text, max_length=None, return_tensors='pt', truncation=False )
 
@@ -64,10 +56,6 @@ def summary(text,max_length):
         chunk_start += tokenizer.model_max_length  # == 1024 for Bart
         chunk_end += tokenizer.model_max_length  # == 1024 for Bart
 
-
-   
-
-
     summary_batch_lst = []
     for inputs in inputs_batch_lst:
         summary = summarizer(
@@ -77,13 +65,10 @@ def summary(text,max_length):
             length_penalty=2.0,
             do_sample=False
         )[0]['summary_text']
-
         summary_batch_lst.append(summary)
-
     # join the summaries into one string
     summary_all = '\n'.join(summary_batch_lst)
     return summary_all
-
 
 
 # Define a set of unwanted symbols
@@ -118,12 +103,10 @@ def get_text_from_website(url):
         # Preprocess the extracted text
         text = preprocess_text(text)
         print(len(text))
-
         return text
     except Exception as e:
         return f"Error: {e}"
     
-
 
 def get_ans(texts,query):
     embeddings = HuggingFaceEmbeddings(model_name=ans_model)
@@ -159,9 +142,6 @@ def get_pdf_text(uploaded_file):
 
 
 
-
-
-
 def app():
     
     # Sidebar
@@ -184,26 +164,15 @@ def app():
         
         if uploaded_file is not None and summary_button:
         # Container 1 for specific content
-            
             with container1:
-        
-              
                 pdf_text = get_pdf_text(uploaded_file)
                 preprocessed_text = preprocess_text(pdf_text)
-                
-                
                 output = summary(preprocessed_text, max_length=max_length)
                 st.write(preprocessed_text)
-                
-
-            
             with container2:
-                
                 st.write(output)
-            
 
         elif website_url and summary_button:
-            container1=st.container(border=True,height=300)
             with container1:
                 st.markdown("#### Article")
                 extracted_text = get_text_from_website(website_url)
@@ -212,23 +181,18 @@ def app():
                 else:
                     st.write(extracted_text)
                     output=summary(extracted_text,max_length=max_length)
-
-            container2=st.container(border=True,height=300)
+                    
             with container2:
                 st.markdown("#### Summary")
                 st.write(output)
 
-
-            
     with col2:
         st.header("Ask About the ARTICLE")
         query = st.text_input("Question: ")
         container3=st.container(border=True,height=500)
         # container3.write('answer')
         container3.header("Answer")
-        
-        
-        
+
         text=''
         if uploaded_file is not None:
             pdf_reader = PdfReader(uploaded_file)
