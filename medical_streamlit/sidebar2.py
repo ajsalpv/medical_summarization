@@ -39,6 +39,8 @@ def model_ans():
     # w_mdl='sentence-transformers/all-MiniLM-L6-v2'
 
     return mdl,w_mdl
+model_name,tokenizer=load_medical_summarization_model()
+ans_model,w_ans_model=model_ans()
 
 
 
@@ -203,8 +205,7 @@ def get_pdf_text(uploaded_file):
 
 
 def app():
-    model_name,tokenizer=load_medical_summarization_model()
-    ans_model,w_ans_model=model_ans()
+    
     global pdf_db
     global web_db
     global embeddings
@@ -321,5 +322,6 @@ def app():
 
 
 if __name__ == "__main__":
+    
     app()
    
