@@ -28,7 +28,7 @@ def load_medical_summarization_model():
     # Return the loaded model and tokenizer
     return model_name, tokenizer
 
-model_name,tokenizer=load_medical_summarization_model()
+
 @st.cache_resource
 def model_ans():
     # mdl='Maite89/Roberta_finetuning_semantic_similarity_stsb_multi_mt'
@@ -40,7 +40,7 @@ def model_ans():
 
     return mdl,w_mdl
 
-ans_model,w_ans_model=model_ans()
+
 
 
 
@@ -203,6 +203,8 @@ def get_pdf_text(uploaded_file):
 
 
 def app():
+    model_name,tokenizer=load_medical_summarization_model()
+    ans_model,w_ans_model=model_ans()
     global pdf_db
     global web_db
     global embeddings
