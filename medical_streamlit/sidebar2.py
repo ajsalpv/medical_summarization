@@ -9,7 +9,6 @@ from langchain.text_splitter import CharacterTextSplitter,RecursiveCharacterText
 # from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
-from dotenv import load_dotenv
 from transformers import AutoModel, AutoTokenizer
 # from sentence_transformers import SentenceTransformer
 # from langchain.chains.question_answering import load_qa_chain
