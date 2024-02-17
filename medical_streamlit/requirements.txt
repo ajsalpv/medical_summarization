@@ -3,6 +3,6 @@ bs4
 transformers
 torch
 langchain
-langchain-community==0.2.0
+langchain-community
 sentence_transformers
 faiss-cpu
