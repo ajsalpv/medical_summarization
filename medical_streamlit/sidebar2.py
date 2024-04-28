@@ -39,36 +39,37 @@ def model_ans():
 
 ans_model,w_ans_model=model_ans()
 
-def summary(text,max_length):
-    summarizer = pipeline("summarization", model=model_name, tokenizer=model_name)
-    # tokenize without truncation
-    inputs_no_trunc = tokenizer(text, max_length=None, return_tensors='pt', truncation=False )
+def summary(text, max_length):
+  summarizer = pipeline("summarization", model=model_name, tokenizer=model_name)
 
-    # get batches of tokens corresponding to the exact model_max_length
-    chunk_start = 0
-    chunk_end = tokenizer.model_max_length  # == 1024 for Bart
-    inputs_batch_lst = []
-    while chunk_start <= len(inputs_no_trunc['input_ids'][0]):
-        
-        inputs_batch = inputs_no_trunc['input_ids'][0][chunk_start:chunk_end]  # get batch of n tokens
-        inputs_batch = torch.unsqueeze(inputs_batch, 0)
-        inputs_batch_lst.append(inputs_batch)
-        chunk_start += tokenizer.model_max_length  # == 1024 for Bart
-        chunk_end += tokenizer.model_max_length  # == 1024 for Bart
+  # Tokenize without truncation
+#   inputs_no_trunc = tokenizer(text, max_length=None, return_tensors='pt', truncation=False)
 
-    summary_batch_lst = []
-    for inputs in inputs_batch_lst:
-        summary = summarizer(
-            tokenizer.decode(inputs[0], skip_special_tokens=True),
-            max_length=max_length//len(inputs_batch_lst),
-            min_length=100//len(inputs_batch_lst),
-            length_penalty=2.0,
-            do_sample=False
-        )[0]['summary_text']
-        summary_batch_lst.append(summary)
-    # join the summaries into one string
-    summary_all = '\n'.join(summary_batch_lst)
-    return summary_all
+  # Configure RecursiveCharacterTextSplitter (adjust chunk_size as needed)
+  splitter = RecursiveCharacterTextSplitter(chunk_size=tokenizer.model_max_length - 2)
+
+  # Split the text into chunks
+  chunks = splitter.split_text(text)
+
+  summary_batch_lst = []
+  for chunk in chunks:
+    # Preprocess the chunk
+    inputs_batch = tokenizer(chunk, return_tensors="pt", truncation=False)
+
+    # Generate summary for the chunk with adjusted max_length
+    summary = summarizer(
+      tokenizer.decode(inputs_batch['input_ids'][0], skip_special_tokens=True),
+      max_length=max_length // len(chunks),  # Adjust max_length per chunk
+      min_length=100 // len(chunks),
+      length_penalty=2.0,
+      do_sample=False
+    )[0]['summary_text']
+    summary_batch_lst.append(summary)
+
+  # Join the summaries into one string
+  summary_all = '\n'.join(summary_batch_lst)
+  return summary_all
+
 
 
 # Define a set of unwanted symbols
