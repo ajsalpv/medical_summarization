@@ -115,8 +115,11 @@ def get_ans(texts,query):
     print('embeddign')
     db = FAISS.from_texts(texts, embeddings)
     print('vector')
-    retriever=db.as_retriever(search_type='similarity_score_threshold', search_kwargs={"score_threshold": 0.5})
-    docs = retriever.get_relevant_documents(query)
+    # retriever=db.as_retriever(search_type='similarity_score_threshold', search_kwargs={"score_threshold": 0.5})
+    
+    # docs = retriever.get_relevant_documents(query)
+    embedding_vector = embeddings.embed_query(query)
+    docs=db.similarity_search_by_vector(embedding_vector)
     return docs
 
 
