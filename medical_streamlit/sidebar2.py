@@ -218,7 +218,7 @@ def app():
             texts=text_splitter.split_text(text)
             print(len(texts),type(texts))
             if query:
-                wdocs=get_ans_web(texts,query)
+                wdocs=get_ans(texts,query)
                 strr=str(wdocs[0])
                 strr=strr.replace('page_content=', '')
                 container3.write(strr)
