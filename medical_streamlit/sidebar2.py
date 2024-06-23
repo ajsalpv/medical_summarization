@@ -202,10 +202,7 @@ def app():
             texts = text_splitter.split_text(text)
             print(len(texts),type(texts))
             if query:
-                print(query)
                 docs=get_ans(texts,query)
-                print('length of the docs',len(docs))
-                print(type(docs))
                 ans=str(docs[0])
                 ans=ans.replace('page_content=', '')
                 container3.write(ans)
@@ -221,9 +218,7 @@ def app():
             texts=text_splitter.split_text(text)
             print(len(texts),type(texts))
             if query:
-                print("link query",query)
                 wdocs=get_ans_web(texts,query)
-                print(type(wdocs))
                 strr=str(wdocs[0])
                 strr=strr.replace('page_content=', '')
                 container3.write(strr)
