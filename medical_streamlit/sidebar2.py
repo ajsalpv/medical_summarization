@@ -111,10 +111,7 @@ def get_text_from_website(url):
 
 def get_ans(texts,query):
     embeddings = HuggingFaceEmbeddings(model_name=ans_model)
-        
-    print('embeddign')
     db = FAISS.from_texts(texts, embeddings)
-    print('vector')
     # retriever=db.as_retriever(search_type='similarity_score_threshold', search_kwargs={"score_threshold": 0.5})
     
     # docs = retriever.get_relevant_documents(query)
@@ -124,16 +121,10 @@ def get_ans(texts,query):
 
 
 def get_ans_web(texts,query):
-    # texts=texts[0]
-    print('type of the docs is : ',type(texts),'length of the docs: ',len(texts))
     embeddings = HuggingFaceEmbeddings(model_name=w_ans_model)
-        
-    print('embeddign')
     db = FAISS.from_texts(texts, embeddings)
-    print('vector')
     embedding_vector = embeddings.embed_query(query)
     docs=db.similarity_search_by_vector(embedding_vector)
-    print('type of the docs is : ',type(docs),'length of the docs: ',len(docs))
     return docs
 
 
