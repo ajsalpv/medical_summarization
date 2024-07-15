@@ -6,3 +6,4 @@ langchain
 langchain-community
 sentence_transformers
 faiss-cpu
+langchain_google_genai
