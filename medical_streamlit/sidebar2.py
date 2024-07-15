@@ -6,10 +6,15 @@ from bs4 import BeautifulSoup
 from transformers import T5ForConditionalGeneration, AutoTokenizer, pipeline
 import torch
 from langchain.text_splitter import CharacterTextSplitter,RecursiveCharacterTextSplitter
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain.llms import HuggingFaceHub
 from transformers import AutoModel, AutoTokenizer
+from langchain.prompts import PromptTemplate
+import google.generativeai as genai
+from langchain_google_genai import GoogleGenerativeAI
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough
 # from sentence_transformers import SentenceTransformer
 # from langchain.chains.question_answering import load_qa_chain
 
@@ -34,19 +39,20 @@ model_name,tokenizer=load_medical_summarization_model()
 def model_ans():
     # mdl='Maite89/Roberta_finetuning_semantic_similarity_stsb_multi_mt'
     mdl='sentence-transformers/all-mpnet-base-v2'
-    w_mdl='sentence-transformers/all-MiniLM-L6-v2'
-    return mdl,w_mdl
+    # mdl='google/gemma-2-9b'
+    llm = GoogleGenerativeAI(model="gemini-pro", google_api_key='AIzaSyCCC9UN48NFIiTv4tTGb2SKR2HRHy93ZXk')
+    return mdl,llm
 
-ans_model,w_ans_model=model_ans()
+ans_model,llm=model_ans()
 
 def summary(text, max_length):
   summarizer = pipeline("summarization", model=model_name, tokenizer=model_name)
 
-  # Tokenize without truncation
-#   inputs_no_trunc = tokenizer(text, max_length=None, return_tensors='pt', truncation=False)
+
 
   # Configure RecursiveCharacterTextSplitter (adjust chunk_size as needed)
-  splitter = RecursiveCharacterTextSplitter(chunk_size=tokenizer.model_max_length - 2)
+  splitter = RecursiveCharacterTextSplitter(chunk_size=tokenizer.model_max_length - 2,
+                                            chunk_overlap=100,)
 
   # Split the text into chunks
   chunks = splitter.split_text(text)
@@ -69,7 +75,6 @@ def summary(text, max_length):
   # Join the summaries into one string
   summary_all = '\n'.join(summary_batch_lst)
   return summary_all
-
 
 
 # Define a set of unwanted symbols
@@ -111,20 +116,25 @@ def get_text_from_website(url):
 
 def get_ans(texts,query):
     embeddings = HuggingFaceEmbeddings(model_name=ans_model)
+        
+    print('embeddign')
     db = FAISS.from_texts(texts, embeddings)
-    # retriever=db.as_retriever(search_type='similarity_score_threshold', search_kwargs={"score_threshold": 0.5})
-    
-    # docs = retriever.get_relevant_documents(query)
-    embedding_vector = embeddings.embed_query(query)
-    docs=db.similarity_search_by_vector(embedding_vector)
+    print('vector')
+    retriever=db.as_retriever(search_type='similarity_score_threshold', search_kwargs={"score_threshold": 0.5})
+    docs = retriever.get_relevant_documents(query)
     return docs
 
 
 def get_ans_web(texts,query):
-    embeddings = HuggingFaceEmbeddings(model_name=w_ans_model)
+    # texts=texts[0]
+    print('type of the docs is : ',type(texts),'length of the docs: ',len(texts))
+    embeddings = HuggingFaceEmbeddings(model_name=ans_model)
+    print('embeddign')
     db = FAISS.from_texts(texts, embeddings)
+    print('vector')
     embedding_vector = embeddings.embed_query(query)
     docs=db.similarity_search_by_vector(embedding_vector)
+    print('type of the docs is : ',type(docs),'length of the docs: ',len(docs))
     return docs
 
 
@@ -134,6 +144,29 @@ def get_pdf_text(uploaded_file):
     for page in pdf_reader.pages:
         text += page.extract_text()
     return text
+
+def cleaning(answer,question):
+    
+    template = """Thoroughly analyze the answer and check is this answer is correct answer of the question,
+    respond the same answer with more detail only if the answer is correct answer of the question,
+    if the answer is not the answer of the question don't try to make up an answer just respond as 'Unable to find the answer for that question from uploaded article',
+
+    answer: {answer}
+
+    Question: {question}
+
+    Helpful Answer:"""
+    custom_rag_prompt = PromptTemplate.from_template(template)
+
+    rag_chain = (
+    custom_rag_prompt
+    | llm
+    )
+
+    output=rag_chain.invoke({'answer':answer,'question':question})
+    return output
+
+
 
 
 
@@ -184,7 +217,6 @@ def app():
         st.header("Ask About the ARTICLE")
         query = st.text_input("Question: ")
         container3=st.container(border=True,height=500)
-        # container3.write('answer')
         container3.header("Answer")
 
         text=''
@@ -202,10 +234,25 @@ def app():
             texts = text_splitter.split_text(text)
             print(len(texts),type(texts))
             if query:
+                print(query)
                 docs=get_ans(texts,query)
-                ans=str(docs[0])
-                ans=ans.replace('page_content=', '')
-                container3.write(ans)
+                print('length of the docs<<<<<<<<<<<<<<<<<',len(docs))
+                try:
+                    ans=str(docs[0])
+                    ans=ans.replace('page_content=', '')
+                    anss=cleaning(ans,query)
+                    container3.write(anss)
+                except IndexError:
+                    container3.write('Unable to find the answer for that question from uploaded article')
+
+                # ans=str(docs[0])
+                # ans=ans.replace('page_content=', '')
+                # anss=cleaning(ans,query)
+                # container3.write(anss)
+
+
+
+
         elif website_url:
             text=""
             text = get_text_from_website(website_url)
@@ -218,10 +265,19 @@ def app():
             texts=text_splitter.split_text(text)
             print(len(texts),type(texts))
             if query:
-                wdocs=get_ans(texts,query)
-                strr=str(wdocs[0])
-                strr=strr.replace('page_content=', '')
-                container3.write(strr)
+                print("link query",query)
+                wdocs=get_ans_web(texts,query)
+                print('<<<<<<<<<<<<<<<<<',len(wdocs))
+                try:
+                    strr=str(wdocs[0])
+                    strr=strr.replace('page_content=', '')
+                    strrr=cleaning(strr,query)
+                    container3.write(strrr)
+                except IndexError:
+                    container3.write('Unable to find the answer for that question from uploaded article')
+
+
+                
 
         
         
