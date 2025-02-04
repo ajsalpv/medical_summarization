@@ -15,8 +15,7 @@ import google.generativeai as genai
 from langchain_google_genai import GoogleGenerativeAI
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
-# from sentence_transformers import SentenceTransformer
-# from langchain.chains.question_answering import load_qa_chain
+from langchain_groq import ChatGroq
 
 
 
@@ -40,7 +39,9 @@ def model_ans():
     # mdl='Maite89/Roberta_finetuning_semantic_similarity_stsb_multi_mt'
     mdl='sentence-transformers/all-mpnet-base-v2'
     # mdl='google/gemma-2-9b'
-    llm = GoogleGenerativeAI(model="gemini-pro", google_api_key='AIzaSyCCC9UN48NFIiTv4tTGb2SKR2HRHy93ZXk')
+    # llm = GoogleGenerativeAI(model="gemini-pro", google_api_key='AIzaSyCCC9UN48NFIiTv4tTGb2SKR2HRHy93ZXk')
+    llm=ChatGroq(model_name="llama3-8b-8192", groq_api_key="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")
+
     return mdl,llm
 
 ans_model,llm=model_ans()
