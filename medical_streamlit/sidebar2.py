@@ -242,7 +242,10 @@ def app():
                     ans=str(docs[0])
                     ans=ans.replace('page_content=', '')
                     anss=cleaning(ans,query)
-                    container3.write(anss)
+                    if hasattr(anss, "content"):
+                        container3.write(anss.content)
+                    else:
+                        container3.write("No valid response generated.")
                 except IndexError:
                     container3.write('Unable to find the answer for that question from uploaded article')
 
@@ -273,7 +276,10 @@ def app():
                     strr=str(wdocs[0])
                     strr=strr.replace('page_content=', '')
                     strrr=cleaning(strr,query)
-                    container3.write(strrr)
+                    if hasattr(strrr, "content"):
+                        container3.write(strrr.content)
+                    else:
+                        container3.write("No valid response generated.")
                 except IndexError:
                     container3.write('Unable to find the answer for that question from uploaded article')
 
